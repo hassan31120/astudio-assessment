@@ -25,42 +25,90 @@ class ProjectController extends Controller
             }
         }
 
-        return $query->with('attributes.attribute')->get();
+        $projects = $query->with('attributes.attribute')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $projects,
+            'message' => 'Projects retrieved successfully',
+        ], 200);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string',
             'status' => 'required|in:active,inactive,completed',
         ]);
 
-        return Project::create($request->all());
+        $project = Project::create($validatedData);
+
+        return response()->json([
+            'success' => true,
+            'data' => $project,
+            'message' => 'Project created successfully',
+        ], 201);
     }
 
     public function show($id)
     {
-        $project = Project::findOrFail($id);
-        return $project->load('users', 'attributes');
+        $project = Project::with('users', 'attributes')->find($id);
+
+        if (!$project) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Project not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $project,
+            'message' => 'Project retrieved successfully',
+        ], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $project = Project::findOrFail($id);
-        $request->validate([
+        $project = Project::find($id);
+
+        if (!$project) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Project not found',
+            ], 404);
+        }
+
+        $validatedData = $request->validate([
             'name' => 'sometimes|string',
             'status' => 'sometimes|in:active,inactive,completed',
         ]);
 
-        $project->update($request->all());
+        $project->update($validatedData);
 
-        return $project;
+        return response()->json([
+            'success' => true,
+            'data' => $project,
+            'message' => 'Project updated successfully',
+        ], 200);
     }
 
     public function destroy($id)
     {
-        $project = Project::findOrFail($id);
+        $project = Project::find($id);
+
+        if (!$project) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Project not found',
+            ], 404);
+        }
+
         $project->delete();
-        return response()->json(['message' => 'Project deleted']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Project deleted successfully',
+        ], 200);
     }
 }

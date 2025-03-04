@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Timesheet;
@@ -8,12 +9,18 @@ class TimesheetController extends Controller
 {
     public function index()
     {
-        return Timesheet::with('user', 'project')->get();
+        $timesheets = Timesheet::with('user', 'project')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $timesheets,
+            'message' => 'Timesheets retrieved successfully',
+        ], 200);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
             'project_id' => 'required|exists:projects,id',
             'task_name' => 'required|string',
@@ -21,34 +28,75 @@ class TimesheetController extends Controller
             'hours' => 'required|integer|min:1',
         ]);
 
-        return Timesheet::create($request->all());
+        $timesheet = Timesheet::create($validatedData);
+
+        return response()->json([
+            'success' => true,
+            'data' => $timesheet,
+            'message' => 'Timesheet created successfully',
+        ], 201);
     }
 
     public function show($id)
     {
-        $timesheet = Timesheet::findOrFail($id);
-        return $timesheet->load('user', 'project');
+        $timesheet = Timesheet::with('user', 'project')->find($id);
+
+        if (!$timesheet) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Timesheet not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $timesheet,
+            'message' => 'Timesheet retrieved successfully',
+        ], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $timesheet = Timesheet::findOrFail($id);
-        $request->validate([
+        $timesheet = Timesheet::find($id);
+
+        if (!$timesheet) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Timesheet not found',
+            ], 404);
+        }
+
+        $validatedData = $request->validate([
             'task_name' => 'sometimes|string',
             'date' => 'sometimes|date',
             'hours' => 'sometimes|integer|min:1',
         ]);
 
-        $timesheet->update($request->all());
+        $timesheet->update($validatedData);
 
-        return $timesheet;
+        return response()->json([
+            'success' => true,
+            'data' => $timesheet,
+            'message' => 'Timesheet updated successfully',
+        ], 200);
     }
 
     public function destroy($id)
     {
-        $timesheet = Timesheet::findOrFail($id);
+        $timesheet = Timesheet::find($id);
+
+        if (!$timesheet) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Timesheet not found',
+            ], 404);
+        }
+
         $timesheet->delete();
-        return response()->json(['message' => 'Timesheet deleted']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Timesheet deleted successfully',
+        ], 200);
     }
 }
-

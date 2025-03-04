@@ -4,47 +4,95 @@ namespace App\Http\Controllers;
 
 use App\Models\Attribute;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AttributeController extends Controller
 {
     public function index()
     {
-        return Attribute::all();
+        $attributes = Attribute::all();
+        return response()->json([
+            'success' => true,
+            'data' => $attributes,
+            'message' => 'Attributes fetched successfully',
+        ], 200);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|unique:attributes',
+        $validatedData = $request->validate([
+            'name' => 'required|string|unique:attributes,name',
             'type' => 'required|in:text,date,number,select',
         ]);
 
-        return Attribute::create($request->all());
+        $attribute = Attribute::create($validatedData);
+
+        return response()->json([
+            'success' => true,
+            'data' => $attribute,
+            'message' => 'Attribute created successfully',
+        ], 201);
     }
 
     public function show($id)
     {
-        $attribute = Attribute::findOrFail($id);
-        return $attribute;
+        $attribute = Attribute::find($id);
+
+        if (!$attribute) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attribute not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $attribute,
+            'message' => 'Attribute fetched successfully',
+        ], 200);
     }
 
     public function update(Request $request, $id)
     {
-        $attribute = Attribute::findOrFail($id);
-        $request->validate([
+        $attribute = Attribute::find($id);
+
+        if (!$attribute) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attribute not found',
+            ], 404);
+        }
+
+        $validatedData = $request->validate([
             'name' => 'sometimes|string|unique:attributes,name,' . $attribute->id,
             'type' => 'sometimes|in:text,date,number,select',
         ]);
 
-        $attribute->update($request->all());
-        return $attribute;
+        $attribute->update($validatedData);
+
+        return response()->json([
+            'success' => true,
+            'data' => $attribute,
+            'message' => 'Attribute updated successfully',
+        ], 200);
     }
 
     public function destroy($id)
     {
-        $attribute = Attribute::findOrFail($id);
+        $attribute = Attribute::find($id);
+
+        if (!$attribute) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attribute not found',
+            ], 404);
+        }
+
         $attribute->delete();
-        return response()->json(['message' => 'Attribute deleted']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attribute deleted successfully',
+        ], 200);
     }
 }
-
