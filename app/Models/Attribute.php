@@ -11,6 +11,10 @@ class Attribute extends Model
 
     protected $fillable = ['name', 'type'];
 
+    protected $casts = [
+        'type' => 'string',
+    ];
+
     public function values()
     {
         return $this->hasMany(AttributeValue::class);

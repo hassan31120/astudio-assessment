@@ -11,6 +11,10 @@ class Project extends Model
 
     protected $fillable = ['name', 'status'];
 
+    protected $casts = [
+        'status' => 'string',
+    ];
+
     public function users()
     {
         return $this->belongsToMany(User::class);
@@ -21,8 +25,15 @@ class Project extends Model
         return $this->hasMany(Timesheet::class);
     }
 
-    public function attributes()
+    public function attributeValues()
     {
         return $this->hasMany(AttributeValue::class);
+    }
+    
+    public function getAttributesListAttribute()
+    {
+        return $this->attributeValues->mapWithKeys(function ($item) {
+            return [$item->attribute->name => $item->value];
+        });
     }
 }

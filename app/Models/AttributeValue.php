@@ -11,6 +11,10 @@ class AttributeValue extends Model
 
     protected $fillable = ['attribute_id', 'project_id', 'value'];
 
+    protected $casts = [
+        'value' => 'string',
+    ];
+
     public function attribute()
     {
         return $this->belongsTo(Attribute::class);
