@@ -1,4 +1,4 @@
-# 📌 Project Name: Laravel EAV API
+# 📌 Project Name: Astudio Assessment
 
 ## Setup Instructions
 
@@ -49,7 +49,7 @@ php artisan passport:install
 php artisan serve
 ```
 
-## API Documentation
+# 📌 API Documentation
 
 ### Authentication Endpoints
 
