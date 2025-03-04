@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +23,6 @@ class Project extends Model
 
     public function attributes()
     {
-        return $this->hasMany(AttributeValue::class, 'entity_id');
+        return $this->hasMany(AttributeValue::class);
     }
 }
-
