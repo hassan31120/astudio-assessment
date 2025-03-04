@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->string('task_name');
             $table->date('date');
-            $table->integer('hours');
+            $table->unsignedInteger('hours');
             $table->timestamps();
         });
     }

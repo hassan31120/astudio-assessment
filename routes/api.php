@@ -34,8 +34,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::apiResource('attributes', AttributeController::class)->except(['create', 'edit']);
     Route::post('/attribute-values', [AttributeValueController::class, 'store']);
-    Route::put('/attribute-values/{attributeValue}', [AttributeValueController::class, 'update']);
-    Route::delete('/attribute-values/{attributeValue}', [AttributeValueController::class, 'destroy']);
+    Route::put('/attribute-values/{id}', [AttributeValueController::class, 'update']);
+    Route::delete('/attribute-values/{id}', [AttributeValueController::class, 'destroy']);
 
     Route::get('/projects/filter', [ProjectController::class, 'filter']);
 });
