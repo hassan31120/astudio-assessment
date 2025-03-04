@@ -7,16 +7,6 @@ use App\Http\Controllers\TimesheetController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AttributeValueController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -24,11 +14,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/projects', [ProjectController::class, 'index']);
-    Route::post('/projects', [ProjectController::class, 'store']);
-    Route::get('/projects/{id}', [ProjectController::class, 'show']);
-    Route::put('/projects/{id}', [ProjectController::class, 'update']);
-    Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+    Route::prefix('projects')->group(function () {
+        Route::get('/filter', [ProjectController::class, 'filter']);
+        Route::apiResource('/', ProjectController::class)->except(['create', 'edit']);
+    });
 
     Route::apiResource('timesheets', TimesheetController::class)->except(['create', 'edit']);
 
@@ -36,6 +25,4 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/attribute-values', [AttributeValueController::class, 'store']);
     Route::put('/attribute-values/{id}', [AttributeValueController::class, 'update']);
     Route::delete('/attribute-values/{id}', [AttributeValueController::class, 'destroy']);
-
-    Route::get('/projects/filter', [ProjectController::class, 'filter']);
 });
